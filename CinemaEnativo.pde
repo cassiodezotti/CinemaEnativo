@@ -11,7 +11,7 @@ Communication communication = new Communication("192.168.15.16", pdPort, myPort)
 void setup()
 {
   size(600, 600, P3D);
-  sphere = new Sphere(this, 0.5);
+  sphere = new Sphere(this, 0.8);
   frameRate(scene.frameRate_);
   scene.init();
 }
@@ -21,9 +21,20 @@ void draw()
   scene.update();
   for(Skeleton skeleton:scene.activeSkeletons.values()){ //example of consulting feature
     //sphere.cameraRotX = sphere.cameraRotX + skeleton.features.steeringWheel.pitchStep;
-    sphere.cameraRotX = sphere.cameraRotX + map(skeleton.features.steeringWheel.position.y, -0.4, 0.4, PI/64, -PI/64);
-    sphere.cameraRotY = sphere.cameraRotY + skeleton.features.steeringWheel.yawStep;
+    sphere.cameraRotX = sphere.cameraRotX + (map(skeleton.features.steeringWheel.position.y, 1, 1.5, PI/64, -PI/64))*sphere.transZSensibility;
+    sphere.cameraRotY = sphere.cameraRotY + (skeleton.features.steeringWheel.yawStep)*sphere.transZSensibility;
     sphere.cameraTransZ = map(skeleton.features.steeringWheel.positionPercentageOfRoom.z, -1, 1, 200, -200);
+    
+    if (sphere.cameraTransZ > 200){
+      sphere.transZSensibility = 0;
+    }
+    else if(sphere.cameraTransZ < 0) {
+      sphere.transZSensibility = 1 ; 
+    }
+    else {
+      sphere.transZSensibility = map(skeleton.features.steeringWheel.positionPercentageOfRoom.z,-1,1,0,1);
+    }
+    println("transZSensibility: "+ sphere.transZSensibility);
   }
   
   
@@ -60,8 +71,8 @@ void mouseDragged() {
   } 
   else{
     if(mouseButton == LEFT){
-      sphere.cameraRotX = (sphere.cameraRotX - (mouseY - pmouseY)*PI/height)%TWO_PI;
-      sphere.cameraRotY = (sphere.cameraRotY + (mouseX - pmouseX)*PI/width)%TWO_PI;
+      sphere.cameraRotX = (sphere.cameraRotX - sphere.transZSensibility*(mouseY - pmouseY)*PI/height)%TWO_PI;
+      sphere.cameraRotY = (sphere.cameraRotY + sphere.transZSensibility*(mouseX - pmouseX)*PI/width)%TWO_PI;
     }
     
   }
@@ -85,4 +96,16 @@ void mouseWheel(MouseEvent event) {
       sphere.cameraTransZ = sphere.cameraTransZ - 10;
     }
   }
+  if (sphere.cameraTransZ > 200){
+    sphere.transZSensibility = 0;
+  }
+  else if(sphere.cameraTransZ < 0) {
+   
+   sphere.transZSensibility = 1 ; 
+  }
+  else {
+    sphere.transZSensibility = map(sphere.cameraTransZ, 200, 0, 0, 1) ;
+  }
+  println("transZSensibility: "+ sphere.transZSensibility);
+    
 }

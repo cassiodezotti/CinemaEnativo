@@ -8,6 +8,7 @@ class Sphere {
   public float cameraRotX = 0;
   public float cameraRotY = 0;
   public float cameraTransZ = 0;
+  public float transZSensibility = 1;
     
   Sphere (PApplet pApplet, float clipDensity) {// clipDensity:Percentage of sphere area covered with clips.
     int totalNumberOfClips = 0;

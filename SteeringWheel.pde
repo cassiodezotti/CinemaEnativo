@@ -46,7 +46,7 @@ class SteeringWheel{
         this.yawSize = abs(this.features.vectorConnectingHands.x);
       }
     } else {
-      this.position.y = 0;
+      this.position.y = 1.25;
       this.rollSize = 0;
       this.pitchSize = 0;
       this.yawSize = 0;

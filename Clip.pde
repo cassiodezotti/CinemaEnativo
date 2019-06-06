@@ -6,7 +6,7 @@ class Clip {
   private float movieAspectRatio;
   private float movieHeight;
   private float movieWidth;
-  private int nOfDifferentClips = 7;
+  private int nOfDifferentClips = 5;
   private PVector centerDirection; // V1
   private PVector verticalDirection; // V2
   private PVector horizontalDirection; // V3
@@ -22,7 +22,8 @@ class Clip {
     this.centerPosition = PVector.mult(this.centerDirection, this.sphere.radius);
     
     int randomMovie = (int) random(nOfDifferentClips-0.001);
-    this.movie = new Movie(pApplet, "silent_movie"+randomMovie+".mp4");
+    //this.movie = new Movie(pApplet, "silent_movie"+randomMovie+".mp4");   
+    this.movie = new Movie(pApplet, "aurora"+randomMovie+".mov");
     this.movie.speed(this.movieSpeed);
     this.movie.loop();
     this.movie.jump(random(this.movie.duration()));
