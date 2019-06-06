@@ -4,9 +4,9 @@ Scene scene = new Scene();
 Sphere sphere;
 
 
-int pdPort = 12000;
+int pdPort = 9000;
 int myPort = 3001;
-Communication communication = new Communication("192.168.15.16", pdPort, myPort);
+Communication communication = new Communication("143.106.219.176", pdPort, myPort);
 
 void setup()
 {
@@ -19,6 +19,12 @@ void setup()
 void draw()
 {
   scene.update();
+  if(scene.drawScene){
+    scene.draw(); // measuredSkeletons, jointOrientation, boneRelativeOrientation, handRadius, handStates
+  } else{
+    sphere.display(); //video sphere
+    
+  }
   for(Skeleton skeleton:scene.activeSkeletons.values()){ //example of consulting feature
     //sphere.cameraRotX = sphere.cameraRotX + skeleton.features.steeringWheel.pitchStep;
     sphere.cameraRotX = sphere.cameraRotX + (map(skeleton.features.steeringWheel.position.y, 1, 1.5, PI/64, -PI/64))*sphere.transZSensibility;
@@ -34,18 +40,20 @@ void draw()
     else {
       sphere.transZSensibility = map(skeleton.features.steeringWheel.positionPercentageOfRoom.z,-1,1,0,1);
     }
-    println("transZSensibility: "+ sphere.transZSensibility);
+    
+    communication.sendGrainParameters(skeleton,sphere);
+    
+    
   }
   
   
-  if(scene.drawScene){
+  /*if(scene.drawScene){
     scene.draw(); // measuredSkeletons, jointOrientation, boneRelativeOrientation, handRadius, handStates
   } else{
     sphere.display(); //video sphere
     
-  }
+  }*/
   communication.sendScene(scene);
- 
 }
 
 void keyPressed(){
@@ -106,6 +114,5 @@ void mouseWheel(MouseEvent event) {
   else {
     sphere.transZSensibility = map(sphere.cameraTransZ, 200, 0, 0, 1) ;
   }
-  println("transZSensibility: "+ sphere.transZSensibility);
     
 }

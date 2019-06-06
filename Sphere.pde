@@ -9,6 +9,8 @@ class Sphere {
   public float cameraRotY = 0;
   public float cameraTransZ = 0;
   public float transZSensibility = 1;
+  public int currentVideo = 0;
+  public boolean isPlaying = false;
     
   Sphere (PApplet pApplet, float clipDensity) {// clipDensity:Percentage of sphere area covered with clips.
     int totalNumberOfClips = 0;
@@ -36,8 +38,16 @@ class Sphere {
   public void display() {
     background(0);
     this.setCamera();
+    this.isPlaying = false;
     for(Clip clip:this.clips){
       clip.display();
+      if(clip.isFocus){
+        this.isPlaying = true;
+        this.currentVideo = clip.indexVideo;
+      }
+    }
+    if(!isPlaying){
+      this.currentVideo = 0;
     }
   }
   

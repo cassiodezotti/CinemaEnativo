@@ -15,7 +15,7 @@ public class Communication{
     if(!scene.activeSkeletons.isEmpty()){
       for(Skeleton skeleton:scene.activeSkeletons.values()){
         this.sendKinectSkeleton(skeleton);
-        this.sendGrainParameters(skeleton);
+        //this.sendGrainParameters(skeleton);
         this.sendVideoParameter(skeleton);
         this.sendSteeringWheel(skeleton);
       }
@@ -55,9 +55,25 @@ public class Communication{
     }
   }
   
-  private void sendGrainParameters(Skeleton skeleton){
+  private void sendGrainParameters(Skeleton skeleton,Sphere sphere){
+    PVector relativePos = skeleton.scene.floor.toFloorCoordinateSystem(skeleton.joints[SPINE_BASE].estimatedPosition); 
     OscMessage messageToPd = new OscMessage("/Ready");
-    messageToPd = new OscMessage("/mid_z");
+    messageToPd = new OscMessage("/indexVideo");
+    messageToPd.add(sphere.currentVideo);
+    println("indexVideo: "+sphere.currentVideo);
+    this.oscP5.send(messageToPd, pdAddress);
+    messageToPd = new OscMessage("/zPos");
+    messageToPd.add(map((relativePos.z),-1.5,1.5,1,0));
+    this.oscP5.send(messageToPd, pdAddress);
+    println("zPos: "+map((relativePos.z),-1.5,1.5,1,0));
+    println("zPosReal: "+(relativePos.z));
+    messageToPd = new OscMessage("/xPos");
+    messageToPd.add(map((relativePos.x),-1.7,1.5,0,1));
+    this.oscP5.send(messageToPd, pdAddress);
+    println("Xpos: "+map((relativePos.x),-1.7,1.5,0,1));
+    println("xPosReal: "+(relativePos.x));
+    
+    /*messageToPd = new OscMessage("/mid_z");
     messageToPd.add(map((skeleton.joints[SPINE_BASE].estimatedPosition.z),0.4,3.5,0,1));
     this.oscP5.send(messageToPd, pdAddress);
     messageToPd = new OscMessage("/hand_left_x");
@@ -71,7 +87,7 @@ public class Communication{
     this.oscP5.send(messageToPd, pdAddress);
     messageToPd = new OscMessage("/hand_right_y");
     messageToPd.add(map((skeleton.joints[HAND_RIGHT].estimatedPosition.y),-1.5,1,0,1));
-    this.oscP5.send(messageToPd, pdAddress);
+    this.oscP5.send(messageToPd, pdAddress);*/
   }
   
   private void sendVideoParameter(Skeleton skeleton){
