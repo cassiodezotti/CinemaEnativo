@@ -6,7 +6,7 @@ Sphere sphere;
 
 int pdPort = 9000;
 int myPort = 3001;
-Communication communication = new Communication("143.106.219.176", pdPort, myPort);
+Communication communication = new Communication("143.106.219.175", pdPort, myPort);
 
 void setup()
 {
