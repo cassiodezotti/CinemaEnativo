@@ -1,5 +1,5 @@
 class Sphere {
-  private int radius = 250;
+  private int radius = 200;
   private int[] nClipsInLayer = {1, 7, 12, 14, 12, 7, 1};
   //private int[] nClipsInLayer = {0, 3, 7, 9, 11, 13, 11, 9, 7, 3, 0};
   private float[] startingFi = new float[nClipsInLayer.length];

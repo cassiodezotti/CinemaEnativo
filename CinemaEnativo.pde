@@ -6,11 +6,11 @@ Sphere sphere;
 
 int pdPort = 9000;
 int myPort = 3001;
-Communication communication = new Communication("143.106.219.175", pdPort, myPort);
+Communication communication = new Communication("143.106.219.176", pdPort, myPort);
 
 void setup()
 {
-  size(600, 600, P3D);
+  size(500, 500, P3D);
   sphere = new Sphere(this, 0.8);
   frameRate(scene.frameRate_);
   scene.init();
@@ -28,9 +28,10 @@ void draw()
   for(Skeleton skeleton:scene.activeSkeletons.values()){ //example of consulting feature
     //sphere.cameraRotX = sphere.cameraRotX + skeleton.features.steeringWheel.pitchStep;
     sphere.cameraRotX = sphere.cameraRotX + (map(skeleton.features.steeringWheel.position.y, 1, 1.5, PI/64, -PI/64))*sphere.transZSensibility;
+    println("\nTranslação Volante: "+10*map(skeleton.features.steeringWheel.position.y, 1, 1.5, PI/64, -PI/64)*sphere.transZSensibility);
     sphere.cameraRotY = sphere.cameraRotY + (skeleton.features.steeringWheel.yawStep)*sphere.transZSensibility;
+    println("\nRotação Volante: "+ 10*(skeleton.features.steeringWheel.yawStep)*sphere.transZSensibility);
     sphere.cameraTransZ = map(skeleton.features.steeringWheel.positionPercentageOfRoom.z, -1, 1, 200, -200);
-    
     if (sphere.cameraTransZ > 200){
       sphere.transZSensibility = 0;
     }

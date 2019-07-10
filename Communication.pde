@@ -60,18 +60,28 @@ public class Communication{
     OscMessage messageToPd = new OscMessage("/Ready");
     messageToPd = new OscMessage("/indexVideo");
     messageToPd.add(sphere.currentVideo);
-    println("indexVideo: "+sphere.currentVideo);
+    println("\nindexVideo: "+sphere.currentVideo);
     this.oscP5.send(messageToPd, pdAddress);
+    
     messageToPd = new OscMessage("/zPos");
+   // teste com o tamanho da sala 
+    messageToPd.add(map((relativePos.z),-(skeleton.scene.floor.dimensions.z)/2,(skeleton.scene.floor.dimensions.z)/2,1,0));
+    println("\nRealZpos: "+map((relativePos.z),-(skeleton.scene.floor.dimensions.z)/2,-(skeleton.scene.floor.dimensions.x)/2,0,1));
     messageToPd.add(map((relativePos.z),-1.5,1.5,1,0));
+    println("\nzPos: "+map((relativePos.z),-1.5,1.5,1,0));
     this.oscP5.send(messageToPd, pdAddress);
-    println("zPos: "+map((relativePos.z),-1.5,1.5,1,0));
-    println("zPosReal: "+(relativePos.z));
+    
+    
     messageToPd = new OscMessage("/xPos");
+    // teste com o tamanho da sala 
+    messageToPd.add(map((relativePos.x),-(skeleton.scene.floor.dimensions.x)/2,-(skeleton.scene.floor.dimensions.x)/2,0,1));
+    println("\nRealXpos: "+map((relativePos.x),-(skeleton.scene.floor.dimensions.x)/2,-(skeleton.scene.floor.dimensions.x)/2,0,1));
     messageToPd.add(map((relativePos.x),-1.7,1.5,0,1));
+    println("\nXpos: "+map((relativePos.x),-1.7,1.5,0,1));
     this.oscP5.send(messageToPd, pdAddress);
-    println("Xpos: "+map((relativePos.x),-1.7,1.5,0,1));
-    println("xPosReal: "+(relativePos.x));
+    
+    
+    println("\n\n\n");
     
     /*messageToPd = new OscMessage("/mid_z");
     messageToPd.add(map((skeleton.joints[SPINE_BASE].estimatedPosition.z),0.4,3.5,0,1));
