@@ -56,7 +56,13 @@ public class Communication{
   }
   
   private void sendGrainParameters(Skeleton skeleton,Sphere sphere){
-    PVector relativePos = skeleton.scene.floor.toFloorCoordinateSystem(skeleton.joints[SPINE_BASE].estimatedPosition); 
+    PVector relativePos = skeleton.scene.floor.toFloorCoordinateSystem(skeleton.joints[SPINE_BASE].estimatedPosition);
+    float realXPosition = relativePos.x;
+    float realZPosition = relativePos.z;
+    if(skeleton.scene.floor.isCalibrated){
+      realXPosition = constrain(map((relativePos.x),-((skeleton.scene.floor.dimensions.x)/2),((skeleton.scene.floor.dimensions.x)/2),1,0),0,1);
+      realZPosition = constrain(map((relativePos.z),-((skeleton.scene.floor.dimensions.z)/2),((skeleton.scene.floor.dimensions.z)/2),1,0),0,1);
+    }
     OscMessage messageToPd = new OscMessage("/Ready");
     messageToPd = new OscMessage("/indexVideo");
     messageToPd.add(sphere.currentVideo);
@@ -64,20 +70,16 @@ public class Communication{
     this.oscP5.send(messageToPd, pdAddress);
     
     messageToPd = new OscMessage("/zPos");
-   // teste com o tamanho da sala 
-    messageToPd.add(map((relativePos.z),-(skeleton.scene.floor.dimensions.z)/2,(skeleton.scene.floor.dimensions.z)/2,1,0));
-    println("\nRealZpos: "+map((relativePos.z),-(skeleton.scene.floor.dimensions.z)/2,-(skeleton.scene.floor.dimensions.x)/2,0,1));
-    messageToPd.add(map((relativePos.z),-1.5,1.5,1,0));
-    println("\nzPos: "+map((relativePos.z),-1.5,1.5,1,0));
-    this.oscP5.send(messageToPd, pdAddress);
     
+    messageToPd.add(realZPosition);
+    println("\nzPos: "+realZPosition);
+    this.oscP5.send(messageToPd, pdAddress);
+        
     
     messageToPd = new OscMessage("/xPos");
-    // teste com o tamanho da sala 
-    messageToPd.add(map((relativePos.x),-(skeleton.scene.floor.dimensions.x)/2,-(skeleton.scene.floor.dimensions.x)/2,0,1));
-    println("\nRealXpos: "+map((relativePos.x),-(skeleton.scene.floor.dimensions.x)/2,-(skeleton.scene.floor.dimensions.x)/2,0,1));
-    messageToPd.add(map((relativePos.x),-1.7,1.5,0,1));
-    println("\nXpos: "+map((relativePos.x),-1.7,1.5,0,1));
+    
+    messageToPd.add(realXPosition);
+    println("\nXpos: "+realXPosition);
     this.oscP5.send(messageToPd, pdAddress);
     
     
