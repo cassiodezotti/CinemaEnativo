@@ -26,7 +26,6 @@ public class Joint{
   private PVector measuredDirectionX;
   private PVector measuredDirectionY;
   private PVector measuredDirectionZ;
-  
   public Joint(int jointId, KJoint kJoint, Skeleton skeleton){
     this.skeleton = skeleton;
     this.jointId = jointId;
@@ -215,7 +214,8 @@ public class Joint{
     this.estimatedDirectionZ = qMult(qMult(this.estimatedOrientation, new Quaternion(0, 0, 0, 1)), qConjugate(this.estimatedOrientation)).vector; 
     this.measuredDirectionX = qMult(qMult(this.measuredOrientation, new Quaternion(0, 1, 0, 0)), qConjugate(this.measuredOrientation)).vector; 
     this.measuredDirectionY = qMult(qMult(this.measuredOrientation, new Quaternion(0, 0, 1, 0)), qConjugate(this.measuredOrientation)).vector; 
-    this.measuredDirectionZ = qMult(qMult(this.measuredOrientation, new Quaternion(0, 0, 0, 1)), qConjugate(this.measuredOrientation)).vector; 
+    this.measuredDirectionZ = qMult(qMult(this.measuredOrientation, new Quaternion(0, 0, 0, 1)), qConjugate(this.measuredOrientation)).vector;
+     
   }
   
 /**

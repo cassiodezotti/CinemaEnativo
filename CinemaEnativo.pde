@@ -48,12 +48,6 @@ void draw()
   }
   
   
-  /*if(scene.drawScene){
-    scene.draw(); // measuredSkeletons, jointOrientation, boneRelativeOrientation, handRadius, handStates
-  } else{
-    sphere.display(); //video sphere
-    
-  }*/
   communication.sendScene(scene);
 }
 
