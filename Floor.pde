@@ -329,7 +329,7 @@ class Floor{
  * Draw the resulting plane.
  */
   public void drawPlane(){
-    if(this.indexToBeUpdated > 3){
+    if(this.indexToBeUpdated > 4){
       stroke(this.scene.roomColor);
       fill(color(30, 60, 90, 128));
       beginShape();
@@ -497,6 +497,8 @@ class Floor{
       popMatrix();
     }  
   }
+  
+
 }
 
 /**

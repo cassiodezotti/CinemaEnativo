@@ -6,12 +6,15 @@ class Clip {
   private float movieAspectRatio;
   private float movieHeight;
   private float movieWidth;
-  private int nOfDifferentClips = 7;
+  private int nOfDifferentClips = 5;
   private PVector centerDirection; // V1
   private PVector verticalDirection; // V2
   private PVector horizontalDirection; // V3
   private PVector centerPosition;
   private PVector vertex1, vertex2, vertex3, vertex4;  
+  public int randomMovie = 0;
+  public int indexVideo = 0;
+  public boolean isFocus = false;
   
   public Clip(PApplet pApplet, Sphere sphere, float movieSize, float fi, float theta){
     this.sphere = sphere;
@@ -21,8 +24,10 @@ class Clip {
     this.horizontalDirection = new PVector(-(sq(sin(theta))*sin(fi)+sq(cos(theta))*sin(fi)), 0, sq(cos(theta))*cos(fi)+sq(sin(theta))*cos(fi));
     this.centerPosition = PVector.mult(this.centerDirection, this.sphere.radius);
     
-    int randomMovie = (int) random(nOfDifferentClips-0.001);
-    this.movie = new Movie(pApplet, "silent_movie"+randomMovie+".mp4");
+    this.randomMovie = (int) random(nOfDifferentClips-0.001);
+    
+    //this.movie = new Movie(pApplet, "silent_movie"+randomMovie+".mp4");   
+    this.movie = new Movie(pApplet, "aurora"+randomMovie+".mov");
     this.movie.speed(this.movieSpeed);
     this.movie.loop();
     this.movie.jump(random(this.movie.duration()));
@@ -44,16 +49,22 @@ class Clip {
   public void display(){
     PVector screenDirection = new PVector(cos(this.sphere.cameraRotY+HALF_PI)*sin(HALF_PI-this.sphere.cameraRotX), cos(HALF_PI-this.sphere.cameraRotX), sin(this.sphere.cameraRotY+HALF_PI)*sin(HALF_PI-this.sphere.cameraRotX)); // Não me pergunte, foi tentativa e erro kkk.
     float apontandoParaTelaOuNao = PVector.dot(this.centerDirection, screenDirection);
-    if(apontandoParaTelaOuNao > cos(radians(10)) && this.sphere.cameraTransZ > 0){ 
+    if(apontandoParaTelaOuNao > cos(radians(10)) && this.sphere.cameraTransZ > 50){ 
       if (movie.available()) {
         this.movie.read();
       }
       this.movie.play();
+      this.isFocus = true;
+      this.indexVideo = (randomMovie+1);
       /*if(this.sphere.cameraTransZ > 200) this.movieSpeed = 2;
       else this.movieSpeed = 2*(this.sphere.cameraTransZ)/200;
       this.movie.speed(this.movieSpeed);*/
-    } else{
+      
+    } 
+    else{
       this.movie.pause();
+      this.isFocus = false;
+      
     }
     pushMatrix();
     translate(this.centerPosition.x, this.centerPosition.y, this.centerPosition.z);

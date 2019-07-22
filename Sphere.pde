@@ -1,5 +1,5 @@
 class Sphere {
-  private int radius = 250;
+  private int radius = 200;
   private int[] nClipsInLayer = {1, 7, 12, 14, 12, 7, 1};
   //private int[] nClipsInLayer = {0, 3, 7, 9, 11, 13, 11, 9, 7, 3, 0};
   private float[] startingFi = new float[nClipsInLayer.length];
@@ -8,6 +8,9 @@ class Sphere {
   public float cameraRotX = 0;
   public float cameraRotY = 0;
   public float cameraTransZ = 0;
+  public float transZSensibility = 1;
+  public int currentVideo = 0;
+  public boolean isPlaying = false;
     
   Sphere (PApplet pApplet, float clipDensity) {// clipDensity:Percentage of sphere area covered with clips.
     int totalNumberOfClips = 0;
@@ -35,8 +38,16 @@ class Sphere {
   public void display() {
     background(0);
     this.setCamera();
+    this.isPlaying = false;
     for(Clip clip:this.clips){
       clip.display();
+      if(clip.isFocus){
+        this.isPlaying = true;
+        this.currentVideo = clip.indexVideo;
+      }
+    }
+    if(!isPlaying){
+      this.currentVideo = 0;
     }
   }
   
