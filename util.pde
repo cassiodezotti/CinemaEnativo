@@ -3,7 +3,11 @@
  * @param meters real world dimension
  * @return screen dimension
  */
-float reScaleX(float meters){
+float reScaleX(float meters, String whoCalledMe){
+  if(Float.isNaN(meters)){
+    println("NaN in: "+whoCalledMe);
+    exit();
+  }
   float horizontalMargin = max(width-height, 0)/2;
   return map(meters, -2, 2, horizontalMargin-width/2, width/2-horizontalMargin);
 }
@@ -13,7 +17,11 @@ float reScaleX(float meters){
  * @param meters real world dimension
  * @return screen dimension
  */
-float reScaleY(float meters){
+float reScaleY(float meters, String whoCalledMe){
+  if(Float.isNaN(meters)){
+    println("NaN in: "+whoCalledMe);
+    exit();
+  }
   float verticalMargin = max(height-width, 0)/2;
   return map(meters, -2, 2, verticalMargin-height/2, height/2-verticalMargin);
 }
@@ -23,7 +31,11 @@ float reScaleY(float meters){
  * @param meters real world dimension
  * @return screen dimension
  */
-float reScaleZ(float meters){
+float reScaleZ(float meters, String whoCalledMe){
+  if(Float.isNaN(meters)){
+    println("NaN in: "+whoCalledMe);
+    exit();
+  }
   return map(meters, 0, 4, 0, min(width, height));
 }
 
@@ -79,7 +91,26 @@ void drawPie3D(PVector v1, PVector v2, float size){
   vertex(0,0,0);
   for(int n = 0; n<nOfVertexes; n++){
     PVector auxiliarPVector = slerp(v1, v2, (float)n/ (float)(nOfVertexes-1));
-    vertex(size*auxiliarPVector.x, size*auxiliarPVector.y, size*auxiliarPVector.z);
+    vertex(reScaleX(size*auxiliarPVector.x, "drawPie3D"), reScaleY(size*auxiliarPVector.y, "drawPie3D"), reScaleZ(size*auxiliarPVector.z, "drawPie3D"));
   }
   endShape(CLOSE);
+}
+
+/**
+ * Auxiliar function to call the vertex function with a PVector.
+ * @param vertex PVector.
+ * @param whoCalledMe string for debbugging.
+ */
+void vertex(PVector vertex, String whoCalledMe){
+  vertex(reScaleX(vertex.x, whoCalledMe), reScaleY(vertex.y, whoCalledMe), reScaleZ(vertex.z, whoCalledMe));
+}
+
+/**
+ * Return the signal of a float (-1 or 1).
+ * @param x value to get the signal from.
+ * @return sign(x) the signal of x.
+ */
+int sign(float x){
+  if(x<0) return -1;
+  else return 1;
 }

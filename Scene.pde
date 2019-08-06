@@ -7,7 +7,7 @@ KinectPV2 kinect = new KinectPV2(this);
  */
 public class Scene{
   public Floor floor;
-  private float frameRate_ = 10;
+  private final float frameRate_ = 10;
   private float cameraTransX = 600;
   private float cameraTransY = 420;
   private float cameraTransZ = -60;
@@ -19,12 +19,21 @@ public class Scene{
   private HashMap<Integer, Skeleton> activeSkeletons = new HashMap<Integer, Skeleton>();
   private float currentDeltaT;
   private float previousDeltaT;
+  public int numberOfSkeletons = 0;
+  public boolean saveSession = false;
+  public String sessionName = "";
+  public PrintWriter savingOutput;
   public boolean drawScene = true;
   public boolean drawMeasured = false;
   public boolean drawBoneRelativeOrientation = false;
   public boolean drawJointOrientation = false;
   public boolean drawHandRadius = false;
   public boolean drawHandStates = false;
+  public boolean drawPollock = false;
+  public boolean drawRondDuBras = false;
+  public boolean drawMomentum = true;
+  public boolean drawCenterOfMass = false;
+  public boolean loadFloorCalibration = true;
   
   public Scene(){
     this.currentDeltaT = 1/this.frameRate_; 
@@ -33,27 +42,56 @@ public class Scene{
   }
   
   public void init(){
+    if(this.loadFloorCalibration) selectInput("Choose a calibrated floor CSV File:", "loadFloorCalibrationThread");
+    if(this.saveSession) thread("startSavingSceneThread");
     kinect.enableSkeleton3DMap(true);
     kinect.init();  
   }
   
+  public void startSavingScene(){
+    println("Enter session name:");
+    userTextInput = "";
+    gettingUserTextInput = true;
+    while(gettingUserTextInput) delay(100);
+    this.sessionName = userTextInput;
+    if(this.sessionName == ""){
+      println("Invalid session name. Session will not be saved.");
+      this.saveSession = false;
+    } else {
+      this.savingOutput = createWriter("savedSessions/"+this.sessionName+"/header.txt");
+      this.savingOutput.println("frameRate: "+this.frameRate_);
+      if(this.floor.isCalibrated){
+        this.savingOutput.println("Floor calibration file used: "+this.floor.selectedCalibrationFilePath);
+        this.savingOutput.println("Floor center position: "+this.floor.centerPosition.x+" "+this.floor.centerPosition.y+" "+this.floor.centerPosition.z);
+        this.savingOutput.println("Floor orientation: "+this.floor.orientation.real+" "+this.floor.orientation.vector.x+" "+this.floor.orientation.vector.y+" "+this.floor.orientation.vector.z);
+        this.savingOutput.println("Floor dimensions: " + this.floor.dimensions.x + " " + this.floor.dimensions.y + " " + this.floor.dimensions.z);
+      } else{
+        this.savingOutput.println("Floor was not calibrated");
+      }
+      this.savingOutput.flush();
+      this.savingOutput.close();
+    }
+  }
   
 /**
  * Get new data from kinect and call its skeletons to update.
  */
   public void update(){
-    this.previousDeltaT = this.currentDeltaT;
-    this.currentDeltaT = 1/frameRate;
-    ArrayList<KSkeleton> kSkeletonArray =  kinect.getSkeleton3d();
-    for (int bodyNumber = 0; bodyNumber < kSkeletonArray.size(); bodyNumber++){
-      KSkeleton kSkeleton = kSkeletonArray.get(bodyNumber);
-      if (!activeSkeletons.containsKey(kSkeleton.getIndexColor())){
-        this.activeSkeletons.put(kSkeleton.getIndexColor(), new Skeleton(kSkeleton, this));
+    if(!this.saveSession || this.sessionName!="") {
+      this.previousDeltaT = this.currentDeltaT;
+      this.currentDeltaT = 1/frameRate;
+      ArrayList<KSkeleton> kSkeletonArray = kinect.getSkeleton3d();
+      for (int bodyNumber = 0; bodyNumber < kSkeletonArray.size(); bodyNumber++){
+        KSkeleton kSkeleton = kSkeletonArray.get(bodyNumber);
+        if (!activeSkeletons.containsKey(kSkeleton.getIndexColor())){ // New skeleton received
+          this.numberOfSkeletons++;
+          this.activeSkeletons.put(kSkeleton.getIndexColor(), new Skeleton(kSkeleton, this));
+        }
+        Skeleton skeleton = activeSkeletons.get(kSkeleton.getIndexColor());
+        skeleton.update(kSkeleton);
       }
-      Skeleton skeleton = activeSkeletons.get(kSkeleton.getIndexColor());
-      skeleton.update(kSkeleton);
+      this.cleanDeadSkeletons();
     }
-    this.cleanDeadSkeletons();
   }
   
   
@@ -65,7 +103,8 @@ public class Scene{
     int s = 0;
     int[] skeletonsToRemove = new int[6];
     for(Skeleton skeleton:activeSkeletons.values()){
-      if(frameCount - skeleton.appearedLastInFrame > frameRate*timeTolerance){ 
+      if(frameCount - skeleton.appearedLastInFrame > frameRate*timeTolerance){
+        if(this.saveSession) skeleton.savingOutput.close();
         skeletonsToRemove[s] = skeleton.indexColor;
         s++;
       }
@@ -83,7 +122,7 @@ public class Scene{
     this.setCamera();
     if(!this.activeSkeletons.isEmpty()){
       for (Skeleton skeleton:this.activeSkeletons.values()) {
-        skeleton.draw(this.drawMeasured, this.drawJointOrientation, this.drawBoneRelativeOrientation, this.drawHandRadius, this.drawHandStates);
+        skeleton.draw(this.drawMeasured, this.drawJointOrientation, this.drawBoneRelativeOrientation, this.drawHandRadius, this.drawHandStates, this.drawPollock, this.drawRondDuBras, this.drawMomentum, this.drawCenterOfMass);
       }
     }
     this.drawKinectFieldOfView();
@@ -98,14 +137,12 @@ public class Scene{
     beginCamera();
     camera();
     translate(this.cameraTransX, this.cameraTransY, this.cameraTransZ);
-    /* Testing Steering Wheel rotating the scene:*/
-    
+    /* Testing Steering Wheel rotating the scene:
     for (Skeleton skeleton:this.activeSkeletons.values()) {
-      this.cameraRotX = this.cameraRotX + skeleton.features.steeringWheel.pitchStep;
-      this.cameraRotY = this.cameraRotY + skeleton.features.steeringWheel.yawStep;
-      this.cameraRotZ = this.cameraRotZ + skeleton.features.steeringWheel.rollStep;
-    }
-    
+      this.cameraRotX = this.cameraRotX + skeleton.steeringWheel.pitchStep;
+      this.cameraRotY = this.cameraRotY + skeleton.steeringWheel.yawStep;
+      this.cameraRotZ = this.cameraRotZ + skeleton.steeringWheel.rollStep;
+    }*/
     rotateX(this.cameraRotX);
     rotateY(this.cameraRotY);
     //rotateZ(this.cameraRotZ);
@@ -119,11 +156,11 @@ public class Scene{
     float size = 0.5; // meters
     strokeWeight(5);
     stroke(255, 0, 0);
-    line(0, 0, 0, reScaleX(size), 0, 0); // The Processing's coordinate system is inconsistent (X cross Y != Z)
+    line(0, 0, 0, reScaleX(size, "scene.drawKinectCoordinateSystem"), 0, 0); // The Processing's coordinate system is inconsistent (X cross Y != Z)
     stroke(0, 255, 0);
-    line(0, 0, 0, 0, reScaleY(size), 0);
+    line(0, 0, 0, 0, reScaleY(size, "scene.drawKinectCoordinateSystem"), 0);
     stroke(0, 0, 255);
-    line(0, 0, 0, 0, 0, reScaleZ(size));
+    line(0, 0, 0, 0, 0, reScaleZ(size, "scene.drawKinectCoordinateSystem"));
   }
   
 /**
@@ -138,8 +175,8 @@ public class Scene{
         float horizontalFoV = 71;
         float minimumDepth = 0.5; // meters
         float maximumDepth = 4; // meters
-        float minimumDepthInPixels = reScaleZ(minimumDepth);
-        float maximumDepthInPixels = reScaleZ(maximumDepth);
+        float minimumDepthInPixels = reScaleZ(minimumDepth, "scene.drawKinectFieldOfView");
+        float maximumDepthInPixels = reScaleZ(maximumDepth, "scene.drawKinectFieldOfView");
       //Color camera:
         //vertical FoV: 54 deg. horizontal FoV: 84 deg.
     // KinectV1
@@ -180,4 +217,11 @@ public class Scene{
     endShape();
     popMatrix();
   }
+}
+
+/**
+ * This method exists to make possible to start saving the scene on another thread other than the setup() loop, because it has a limit of 5000ms to finish before raising an error.
+ */
+void startSavingSceneThread(){ 
+  scene.startSavingScene();
 }
