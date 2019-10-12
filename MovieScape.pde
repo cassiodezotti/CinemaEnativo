@@ -16,27 +16,32 @@ void setup() {
   scene.init();
 }
 
-void draw()
-{
+void draw() {
   scene.update();
+  
   if(scene.drawScene){
     scene.draw(); // measuredSkeletons, jointOrientation, boneRelativeOrientation, handRadius, handStates
   } else{
+    // Your animation algorithm should be placed here
     sphere.display(); //video sphere
-    
   }
-  for(Skeleton skeleton:scene.activeSkeletons.values()){ //example of consulting featurere.transZSensibility;
-    sphere.cameraRotX = sphere.cameraRotX + (map(skeleton.steeringWheel.position.y, 1, 1.5, PI/64, -PI/64))*sphere.transZSensibility;
-    sphere.cameraRotY = sphere.cameraRotY + (skeleton.steeringWheel.yawStep)*sphere.transZSensibility;
-    sphere.cameraTransZ = map(skeleton.steeringWheel.positionPercentageOfRoom.z, -1, 1, 200, -200);
-    if (sphere.cameraTransZ > 250){
+  for(Skeleton skeleton:scene.activeSkeletons.values()){ 
+    sphere.cameraRotX = sphere.cameraRotX + (map(skeleton.steeringWheel.position.y, 1, 1.5, PI/64, -PI/64))*pow(sphere.transZSensibility,2);
+    sphere.cameraRotY = sphere.cameraRotY + (skeleton.steeringWheel.yawStep)*pow(sphere.transZSensibility,2);
+    //println("percent of room",skeleton.steeringWheel.positionPercentageOfRoom.z);
+    if(skeleton.steeringWheel.positionPercentageOfRoom.z < -0.6) sphere.cameraTransZ = -sphere.radius/2;
+    else sphere.cameraTransZ = map(skeleton.steeringWheel.positionPercentageOfRoom.z, -1, 1, -sphere.radius/2, -1.5*sphere.radius);//ver porcentagem da sala, diminuir proximidade
+    sphere.cameraTransZ = pow(sphere.cameraTransZ,2);
+    //cameraTransZ é negativo entao quanto aproxima tem q ficar menos negativo
+    //println("camera z:", sphere.cameraTransZ);
+    if (sphere.cameraTransZ > -(sphere.radius/2+0.1*sphere.radius)){
       sphere.transZSensibility = 0;
     }
-    else if(sphere.cameraTransZ < 0) {
+    else if(sphere.cameraTransZ < -(sphere.radius+sphere.radius*0.4)) {
       sphere.transZSensibility = 1 ; 
     }
     else {
-      println("\n Z volante: ",skeleton.steeringWheel.positionPercentageOfRoom.z);
+      //sphere.transZSensibility = map(sphere.cameraTransZ,-1*(sphere.radius/2),-sphere.radius*1.5,0,1);//ver qual é melhor
       sphere.transZSensibility = map(skeleton.steeringWheel.positionPercentageOfRoom.z,-1,1,0,1);
     }
     
