@@ -49,7 +49,7 @@ class Clip {
   public void display(){
     PVector screenDirection = new PVector(cos(this.sphere.cameraRotY+HALF_PI)*sin(HALF_PI-this.sphere.cameraRotX), cos(HALF_PI-this.sphere.cameraRotX), sin(this.sphere.cameraRotY+HALF_PI)*sin(HALF_PI-this.sphere.cameraRotX)); // Não me pergunte, foi tentativa e erro kkk.
     float apontandoParaTelaOuNao = PVector.dot(this.centerDirection, screenDirection);
-    if(apontandoParaTelaOuNao > cos(radians(10)) && this.sphere.cameraTransZ > 50){ 
+    if(apontandoParaTelaOuNao > cos(radians(10)) && this.sphere.cameraTransZ > -this.sphere.radius){ 
       if (movie.available()) {
         this.movie.read();
       }

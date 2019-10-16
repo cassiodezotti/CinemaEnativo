@@ -29,9 +29,9 @@ void draw() {
     sphere.cameraRotX = sphere.cameraRotX + (map(skeleton.steeringWheel.position.y, 1, 1.5, PI/64, -PI/64))*pow(sphere.transZSensibility,2);
     sphere.cameraRotY = sphere.cameraRotY + (skeleton.steeringWheel.yawStep)*pow(sphere.transZSensibility,2);
     //println("percent of room",skeleton.steeringWheel.positionPercentageOfRoom.z);
-    if(skeleton.steeringWheel.positionPercentageOfRoom.z < -0.6) sphere.cameraTransZ = -sphere.radius/2;
+    if(skeleton.steeringWheel.positionPercentageOfRoom.z < -0.6) sphere.cameraTransZ = -sphere.radius/5;
     else sphere.cameraTransZ = map(skeleton.steeringWheel.positionPercentageOfRoom.z, -1, 1, -sphere.radius/2, -1.5*sphere.radius);//ver porcentagem da sala, diminuir proximidade
-    sphere.cameraTransZ = pow(sphere.cameraTransZ,2);
+    //sphere.cameraTransZ = pow(sphere.cameraTransZ,2);
     //cameraTransZ é negativo entao quanto aproxima tem q ficar menos negativo
     //println("camera z:", sphere.cameraTransZ);
     if (sphere.cameraTransZ > -(sphere.radius/2+0.1*sphere.radius)){
