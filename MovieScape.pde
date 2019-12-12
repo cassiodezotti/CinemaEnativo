@@ -7,10 +7,11 @@ Sphere sphere;
 
 int pdPort = 12000;
 int myPort = 3001;
-Communication communication = new Communication("192.168.15.16", pdPort, myPort);
+Communication communication = new Communication("127.0.0.1", pdPort, myPort);
 
 void setup() {
   size(500, 500, P3D);
+  //fullScreen(P3D);
   sphere = new Sphere(this, 0.8);
   frameRate(scene.frameRate_);
   scene.init();
